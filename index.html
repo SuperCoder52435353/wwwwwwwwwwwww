@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧮 AI Math Solver - Professional Mathematics Assistant</title>
+    <meta name="description" content="AI-powered mathematics problem solver with OCR, step-by-step solutions, and cross-device admin chat">
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Math Particles Background -->
+    <canvas id="bgCanvas"></canvas>
+    <div class="gradient-overlay"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- LOGIN PAGE -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div id="loginPage" class="page">
+        <div class="login-box">
+            <div class="logo-container">
+                <div class="math-symbol rotating">∑</div>
+                <div class="logo-rings">
+                    <div class="ring ring-1"></div>
+                    <div class="ring ring-2"></div>
+                    <div class="ring ring-3"></div>
+                </div>
+            </div>
+            
+            <h1 class="gradient-text">AI Math Solver</h1>
+            <p class="subtitle">Professional Mathematics Problem Solver</p>
+            
+            <div class="login-form">
+                <div class="input-group">
+                    <input type="text" id="loginUsername" placeholder="Username" autocomplete="username" required>
+                    <span class="icon">👤</span>
+                    <div class="input-line"></div>
+                </div>
+                
+                <div class="input-group">
+                    <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" required>
+                    <span class="icon">🔒</span>
+                    <div class="input-line"></div>
+                </div>
+                
+                <label class="checkbox-label">
+                    <input type="checkbox" id="rememberCheck">
+                    <span class="checkmark"></span>
+                    <span>Meni eslab qol</span>
+                </label>
+                
+                <button id="loginBtn" class="btn-primary">
+                    <span>Kirish</span>
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="currentColor" d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature">
+                    <span>📸</span>
+                    <p>OCR</p>
+                </div>
+                <div class="feature">
+                    <span>🧮</span>
+                    <p>Any Problem</p>
+                </div>
+                <div class="feature">
+                    <span>📊</span>
+                    <p>Step-by-Step</p>
+                </div>
+                <div class="feature">
+                    <span>💬</span>
+                    <p>Admin Chat</p>
+                </div>
+            </div>
+            
+            <div class="version">v2.0 Ultimate Edition</div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- MAIN APP -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div id="mainApp" class="page hidden">
+        <div class="app-wrapper">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-left">
+                    <div class="logo-mini">∑</div>
+                    <h2>Math Solver</h2>
+                </div>
+                <div class="header-center">
+                    <div class="search-bar">
+                        <input type="text" id="quickSearch" placeholder="Tezkor qidiruv...">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button id="btnTheme" class="btn-icon" title="Theme">🌓</button>
+                    <button id="btnNotifications" class="btn-icon" title="Notifications">
+                        🔔 <span id="notifBadge" class="badge hidden">0</span>
+                    </button>
+                    <button id="btnAdminChat" class="btn-icon" title="Admin Chat">
+                        💬 <span id="chatBadge" class="badge hidden">0</span>
+                    </button>
+                    <div class="user-dropdown">
+                        <button class="user-avatar">
+                            <span id="currentUser">U</span>
+                        </button>
+                        <div class="dropdown-menu hidden">
+                            <a href="#profile">👤 Profile</a>
+                            <a href="#settings">⚙️ Settings</a>
+                            <a href="#history">📜 History</a>
+                            <div class="divider"></div>
+                            <a href="#logout" id="btnLogout">🚪 Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Stats Dashboard -->
+            <div class="stats-dashboard">
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="0">
+                    <div class="stat-icon blue">🧮</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statSolved">0</div>
+                        <div class="stat-label">Yechilgan Masalalar</div>
+                    </div>
+                    <div class="stat-chart">
+                        <canvas id="chartSolved"></canvas>
+                    </div>
+                </div>
+                
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-icon green">📸</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statImages">0</div>
+                        <div class="stat-label">Rasmlar</div>
+                    </div>
+                    <div class="stat-progress">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-icon orange">⏱️</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statAvgTime">0s</div>
+                        <div class="stat-label">O'rtacha Vaqt</div>
+                    </div>
+                    <div class="stat-trend up">
+                        <svg viewBox="0 0 24 24" width="16" height="16">
+                            <path fill="currentColor" d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+                        </svg>
+                        <span>+23%</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="stat-icon purple">🎯</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statAccuracy">100%</div>
+                        <div class="stat-label">Aniqlik</div>
+                    </div>
+                    <div class="accuracy-ring">
+                        <svg viewBox="0 0 36 36">
+                            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                                  fill="none" stroke="#667eea" stroke-width="2" 
+                                  stroke-dasharray="100, 100"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="content-grid">
+                <!-- Left Panel: Upload -->
+                <div class="panel upload-panel" data-aos="fade-right">
+                    <div class="panel-header">
+                        <h3>📷 Masala Yuklash</h3>
+                        <button class="btn-collapse">−</button>
+                    </div>
+                    
+                    <div class="panel-body">
+                        <!-- Upload Options -->
+                        <div class="upload-options">
+                            <button class="upload-btn" id="btnGallery">
+                                <div class="upload-icon">
+                                    <svg viewBox="0 0 24 24" width="32" height="32">
+                                        <path fill="currentColor" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                                    </svg>
+                                </div>
+                                <span>Gallery</span>
+                                <p>Rasm tanlash</p>
+                            </button>
+                            
+                            <button class="upload-btn" id="btnCamera">
+                                <div class="upload-icon">
+                                    <svg viewBox="0 0 24 24" width="32" height="32">
+                                        <path fill="currentColor" d="M12 17c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0-8c1.65 0 3 1.35 3 3s-1.35 3-3 3-3-1.35-3-3 1.35-3 3-3z"/>
+                                    </svg>
+                                </div>
+                                <span>Camera</span>
+                                <p>Rasm olish</p>
+                            </button>
+                        </div>
+                        
+                        <input type="file" id="fileInput" accept="image/*" hidden>
+                        <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
+                        
+                        <!-- Image Preview -->
+                        <div id="imagePreview" class="image-preview hidden">
+                            <img id="previewImg" alt="Preview">
+                            <button id="btnRemoveImg" class="btn-remove">✕</button>
+                            <div class="image-info">
+                                <span id="imgName">image.jpg</span>
+                                <span id="imgSize">0 KB</span>
+                            </div>
+                            <div class="image-actions">
+                                <button class="btn-icon-sm" title="Rotate">🔄</button>
+                                <button class="btn-icon-sm" title="Crop">✂️</button>
+                                <button class="btn-icon-sm" title="Enhance">✨</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Text Input -->
+                        <div class="quick-input-section">
+                            <div class="section-header">
+                                <h4>✍️ Yoki Matn Kiriting</h4>
+                                <button class="btn-icon-sm" title="Examples">💡</button>
+                            </div>
+                            <textarea id="textInput" placeholder="Masala yozing:&#10;&#10;Misol:&#10;2x + 5 = 13&#10;&#10;Yoki:&#10;Uchburchak perimetri: a=3, b=4, c=5"></textarea>
+                            <button id="btnQuickSolve" class="btn-secondary">
+                                <svg viewBox="0 0 24 24" width="20" height="20">
+                                    <path fill="currentColor" d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+                                </svg>
+                                Tezkor Yechish
+                            </button>
+                        </div>
+                        
+                        <!-- Solve Button -->
+                        <button id="btnSolve" class="btn-solve hidden">
+                            <span class="pulse-ring"></span>
+                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                <path fill="currentColor" d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+                            </svg>
+                            Rasmni Tahlil Qilish
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Solution -->
+                <div class="panel solution-panel" data-aos="fade-left">
+                    <div class="panel-header">
+                        <h3>🎯 Yechim</h3>
+                        <div class="header-actions">
+                            <button class="btn-icon-sm" id="btnClearSolution" title="Clear">🗑️</button>
+                            <button class="btn-icon-sm" id="btnExportSolution" title="Export">📥</button>
+                            <button class="btn-icon-sm" title="Share">🔗</button>
+                        </div>
+                    </div>
+                    
+                    <div class="panel-body">
+                        <div id="solutionBox" class="solution-box">
+                            <div class="empty-state">
+                                <div class="empty-icon">
+                                    <svg viewBox="0 0 24 24" width="80" height="80">
+                                        <path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                                    </svg>
+                                </div>
+                                <h4>Yechim Kutilmoqda</h4>
+                                <p>Rasm yuklang yoki masala yozing</p>
+                                <div class="quick-tips">
+                                    <span class="tip">💡 Tip: Aniq rasm yuklang</span>
+                                    <span class="tip">⚡ Tezkor: Matn kiriting</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Processing Indicator -->
+                        <div id="processingBox" class="processing-box hidden">
+                            <div class="processing-animation">
+                                <div class="cube">
+                                    <div class="face front"></div>
+                                    <div class="face back"></div>
+                                    <div class="face left"></div>
+                                    <div class="face right"></div>
+                                    <div class="face top"></div>
+                                    <div class="face bottom"></div>
+                                </div>
+                            </div>
+                            <p id="processingText">Tahlil qilinmoqda...</p>
+                            <div class="progress-line">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <span id="processingPercent">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Panel -->
+            <div class="panel history-panel" data-aos="fade-up">
+                <div class="panel-header">
+                    <h3>📜 Tarix</h3>
+                    <div class="header-actions">
+                        <select id="historyFilter" class="filter-select">
+                            <option value="all">Barchasi</option>
+                            <option value="today">Bugun</option>
+                            <option value="week">Bu hafta</option>
+                            <option value="month">Bu oy</option>
+                        </select>
+                        <button class="btn-icon-sm" id="btnClearHistory" title="Clear All">🗑️</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div id="historyList" class="history-list">
+                        <div class="empty-msg">
+                            <span>📜</span>
+                            <p>Hali tarix yo'q</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- ADMIN PANEL -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div id="adminPanel" class="page hidden">
+        <div class="admin-wrapper">
+            <header class="admin-header">
+                <h1>🛡️ Admin Control Panel</h1>
+                <div class="admin-actions">
+                    <button id="btnAdminRefresh" class="btn-secondary">🔄 Refresh</button>
+                    <button id="btnAdminExport" class="btn-secondary">📥 Export</button>
+                    <button id="btnAdminLogout" class="btn-danger">🚪 Exit</button>
+                </div>
+            </header>
+
+            <div class="admin-stats-grid">
+                <div class="admin-stat">
+                    <div class="stat-icon-lg">👥</div>
+                    <h3 id="adminUsers">0</h3>
+                    <p>Total Users</p>
+                </div>
+                <div class="admin-stat">
+                    <div class="stat-icon-lg">🧮</div>
+                    <h3 id="adminProblems">0</h3>
+                    <p>Problems Solved</p>
+                </div>
+                <div class="admin-stat">
+                    <div class="stat-icon-lg">📸</div>
+                    <h3 id="adminImages">0</h3>
+                    <p>Images Processed</p>
+                </div>
+                <div class="admin-stat">
+                    <div class="stat-icon-lg">💬</div>
+                    <h3 id="adminChats">0</h3>
+                    <p>Active Chats</p>
+                </div>
+            </div>
+
+            <div class="admin-tabs">
+                <button class="admin-tab-btn active" data-tab="users">👥 Users</button>
+                <button class="admin-tab-btn" data-tab="solutions">🧮 Solutions</button>
+                <button class="admin-tab-btn" data-tab="chats">💬 Chats</button>
+                <button class="admin-tab-btn" data-tab="logs">📋 Logs</button>
+                <button class="admin-tab-btn" data-tab="settings">⚙️ Settings</button>
+            </div>
+
+            <div class="admin-content">
+                <div id="tabUsers" class="admin-tab-content active">
+                    <input type="text" id="searchUsers" placeholder="🔍 Qidirish..." class="search-input">
+                    <div id="usersList" class="admin-list"></div>
+                </div>
+                
+                <div id="tabSolutions" class="admin-tab-content hidden">
+                    <div id="solutionsList" class="admin-list"></div>
+                </div>
+                
+                <div id="tabChats" class="admin-tab-content hidden">
+                    <div class="chat-layout">
+                        <div id="chatUsersList" class="chat-sidebar"></div>
+                        <div id="chatMessagesArea" class="chat-main">
+                            <div class="empty-chat">
+                                <svg viewBox="0 0 24 24" width="60" height="60">
+                                    <path fill="currentColor" d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                                </svg>
+                                <p>Foydalanuvchini tanlang</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tabLogs" class="admin-tab-content hidden">
+                    <div id="logsList" class="admin-list"></div>
+                </div>
+                
+                <div id="tabSettings" class="admin-tab-content hidden">
+                    <div class="settings-grid">
+                        <div class="setting-card">
+                            <h4>📊 Data Export</h4>
+                            <p>Export all data as JSON</p>
+                            <button id="btnExportData" class="btn-primary">Export Data</button>
+                        </div>
+                        <div class="setting-card danger">
+                            <h4>🗑️ Clear All Data</h4>
+                            <p>⚠️ This action cannot be undone!</p>
+                            <button id="btnClearAll" class="btn-danger">Clear Everything</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- MODALS -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    
+    <!-- User Chat Modal -->
+    <div id="chatModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>💬 Admin bilan Chat</h3>
+                <button id="btnCloseChat" class="btn-close">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="userChatMessages" class="chat-messages"></div>
+            </div>
+            <div class="modal-footer">
+                <input type="text" id="chatInput" placeholder="Xabar yozing...">
+                <button id="btnSendChat" class="btn-send">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div id="notifications" class="notifications"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loader">
+            <div class="loader-ring"></div>
+            <div class="loader-ring"></div>
+            <div class="loader-ring"></div>
+            <div class="loader-text" id="loadingText">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="login.js"></script>
+    <script src="admin.js"></script>
+    <script src="chat.js"></script>
+    <script src="solver.js"></script>
+</body>
+</html>
